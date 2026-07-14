@@ -1,0 +1,127 @@
+name: CI Backend
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    name: Build and Test Backend
+    runs-on: ubuntu-latest
+
+    services:
+      mongodb:
+        image: mongo:7
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval 'db.adminCommand({ping: 1})'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'maven'
+          cache-dependency-path: 'backend-spring-boot/playpal/pom.xml'
+
+      - name: Make Maven Wrapper Executable
+        run: chmod +x mvnw
+        working-directory: backend-spring-boot/playpal
+
+      - name: Run Backend Tests
+        id: run-tests
+        run: ./mvnw clean test
+        working-directory: backend-spring-boot/playpal
+
+      - name: Send Notification to Airtable
+        if: always()
+        env:
+          AIRTABLE_PAT: ${{ secrets.AIRTABLE_PAT }}
+          AIRTABLE_BASE_ID: ${{ secrets.AIRTABLE_BASE_ID }}
+          AIRTABLE_TABLE_NAME: ${{ secrets.AIRTABLE_TABLE_NAME }}
+          TEST_OUTCOME: ${{ steps.run-tests.outcome }}
+          COMMIT_SHA: ${{ github.sha }}
+          BRANCH_NAME: ${{ github.ref_name }}
+          ACTOR: ${{ github.actor }}
+        run: |
+          # Check if Airtable secrets are set
+          if [ -z "$AIRTABLE_PAT" ] || [ -z "$AIRTABLE_BASE_ID" ] || [ -z "$AIRTABLE_TABLE_NAME" ]; then
+            echo "::warning::Airtable credentials (AIRTABLE_PAT, AIRTABLE_BASE_ID, or AIRTABLE_TABLE_NAME) are missing. Skipping notification."
+            exit 0
+          fi
+
+          # Determine the build status
+          if [ "$TEST_OUTCOME" = "success" ]; then
+            STATUS="Éxito"
+          else
+            STATUS="Fallo"
+          fi
+
+          # Get current UTC timestamp in ISO 8601 format
+          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+          echo "Preparing payload for project: SQA - Backend SpringBoot"
+          echo "Status: $STATUS"
+          echo "Branch: $BRANCH_NAME"
+          echo "Commit: $COMMIT_SHA"
+          echo "Actor: $ACTOR"
+          echo "Timestamp: $TIMESTAMP"
+
+          # URL-encode the Airtable Table Name to prevent breaks if it has spaces
+          ENCODED_TABLE_NAME=$(jq -rn --arg name "$AIRTABLE_TABLE_NAME" '$name | @uri')
+
+          # Construct the JSON payload for Airtable
+          PAYLOAD=$(jq -n \
+            --arg proj "SQA - Backend SpringBoot" \
+            --arg status "$STATUS" \
+            --arg sha "$COMMIT_SHA" \
+            --arg branch "$BRANCH_NAME" \
+            --arg actor "$ACTOR" \
+            --arg ts "$TIMESTAMP" \
+            '{
+              records: [
+                {
+                  fields: {
+                    "Nombre del proyecto": $proj,
+                    "Estado del Backend": $status,
+                    "Commit SHA": $sha,
+                    "Nombre de la rama": $branch,
+                    "Actor": $actor,
+                    "Timestamp": $ts
+                  }
+                }
+              ]
+            }')
+
+          # Send curl request to Airtable
+          RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" -X POST "https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${ENCODED_TABLE_NAME}" \
+            -H "Authorization: Bearer ${AIRTABLE_PAT}" \
+            -H "Content-Type: application/json" \
+            -d "$PAYLOAD")
+
+          HTTP_CODE=$(echo "$RESPONSE" | tr -d '\r' | tail -n 1 | cut -d':' -f2)
+          BODY=$(echo "$RESPONSE" | head -n -1)
+
+          echo "Airtable Response Code: $HTTP_CODE"
+          echo "Airtable Response Body: $BODY"
+
+          if [ "$HTTP_CODE" -lt 200 ] || [ "$HTTP_CODE" -ge 300 ]; then
+            echo "::error::Failed to send status to Airtable. HTTP status code: $HTTP_CODE"
+            exit 1
+          fi
+          echo "Successfully notified Airtable!"
