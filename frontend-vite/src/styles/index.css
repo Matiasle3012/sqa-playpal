@@ -1,0 +1,318 @@
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@100..900&display=swap');
+@import "tailwindcss";
+:root {
+  font-family: Lexend, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+/* #003d11 color mas oscuro */
+  --color-main: #01621c; 
+  --color-main-darker: #003d11;
+  --color-bg: #fdf9f1;
+  --color-highlight: #ffffff;
+  --color-accent: #64d560;
+  --border-radius: 8px;
+  --border-width: 2px;
+  color-scheme: light;
+  color: var(--color-main);
+  background-color: var(--color-bg);
+  text-align: center;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::-webkit-scrollbar {
+  width: auto;
+  height: auto;
+  background-color: var(--color-bg);
+
+}
+
+::-webkit-scrollbar-track {
+  background-color: var(--color-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-main);
+  border-radius: var(--border-radius);
+  border: 4px solid var(--color-bg);
+}
+
+::-webkit-scrollbar-corner {
+  background-color: var(--color-bg);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+h1 {
+  font-size: 3.2rem;
+  line-height: 1.1;
+  font-weight: 700;
+}
+/* highlight es la clase de los elementos input y button en Login */
+input.highlight, button.highlight {
+  border-radius: var(--border-radius);
+  border: var(--border-width) solid var(--color-main);
+  padding: 0.5rem 1rem;
+  color: var(--color-main);
+  font-size: 1rem;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: transparent;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+
+button.highlight {
+  transition: color 0.25s;
+  transition: background-color 0.25s;
+}
+
+a {
+  cursor: pointer;
+}
+
+input.highlight:hover, .fade-in > div:hover > input.highlight {
+  outline: none;
+  background-color: var(--color-highlight);
+  border-color: var(--color-highlight);
+}
+
+button.highlight:hover {
+  background-color: var(--color-main);
+  color: var(--color-highlight);
+}
+
+button.highlight:focus,
+button.highlight:focus-visible {
+  outline: none;
+}
+
+.vertical-default {
+  border-radius: var(--border-radius);
+  margin: 0.5rem;
+  background-color: transparent;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  border: var(--border-width) solid transparent;
+  padding: 0.5rem 1rem;
+}
+
+.horizontal-default {
+  border-radius: var(--border-radius);
+  margin: 0.5rem;
+  height: 20%;
+  background-color: transparent;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+  border: var(--border-width) solid transparent;
+  padding: 0.5rem 1rem;
+
+}
+
+.login-div {
+  border-radius: var(--border-radius);
+  margin: 0.5rem;
+  background-color: transparent;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: start;
+  width: min-content;
+  gap: 1rem;
+  border: var(--border-width) solid transparent;
+  padding: 0.5rem 1rem;
+
+}
+
+.fade-in > div {
+  transition: background-color 0.5s;
+  transition-behavior: ease;
+}
+
+.fade-in > div:hover {
+  background-color: var(--color-main);
+}
+
+.background-l {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  background-color: transparent;
+  padding: 1rem;
+  pointer-events: none;
+}
+
+.background-r {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  background-color: transparent;
+  padding: 1rem;
+  pointer-events: none;
+}
+
+.overlay-container {
+  width: 100vw;
+  height: 100vh;
+  display: grid;
+  overflow: hidden;
+}
+
+.overlay-container > * {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.effect1 {
+  width: 0.5rem;
+  height: 50%;
+  border-radius: var(--border-radius);
+  background-color: var(--color-main);
+  transition: background-color 0.5s;
+  animation: fadeOpacity 5s ease-in-out infinite;
+}
+
+.effect2 {
+  width: 0.5rem;
+  height: 100%;
+  border-radius: var(--border-radius);
+  background-color: var(--color-main);
+  transition: background-color 0.5s;
+  animation: fadeOpacity 4s ease-in-out infinite;
+}
+
+.margin {
+  margin: auto;
+}
+
+BallCanvas {
+  background-color: transparent;
+  width: 100%;
+  height: 100%;
+}
+
+.error-password-animation {
+  animation: error-password-animation 0.4s ease-in-out 0s 1;
+}
+
+.text-glide > div::before {
+  content: '';
+  width: 1px;
+  height: 1rem;
+  position: relative;
+  left: 1rem;
+  color: transparent;
+  background-color: transparent;
+  opacity: 1;
+}
+
+.text-glide > div:hover::before {
+  background-color: var(--color-highlight);
+  animation: fade-in-text-effect 0.5s ease-in 0s 1 forwards;
+}
+
+.animate-pulse:hover {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animated-text-float {
+  position: relative;
+}
+
+.fade-in > .animated-text-float > label {
+  color: var(--color-main);
+  background-color: transparent;
+  position: absolute;
+  left: 10%;
+  transition: transform 0.5s ease;
+}
+
+.fade-in > .animated-text-float:hover > label {
+  transform: translateX(-150%);
+}
+
+.fade-in > .animated-text-float:hover > input {
+  content-visibility: visible;
+}
+
+.fade-in > .animated-text-float > input {
+  content-visibility: hidden;
+}
+
+.movable {
+  transition: transform 0.5s ease;
+}
+
+.fly-by-left {
+  transform: translateX(70vw);
+}
+
+
+.fly-by-right {
+  transform: translateX(-30vw);
+}
+
+
+/* ANIMACIONES DE AQUI PARA ABAJO */
+
+@keyframes fadeOpacity {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes error-password-animation {
+  0% {
+    pointer-events: none;
+    transform: translate(0px, 0px);
+  }
+  16% {
+    transform: translate(-7px, 0px);
+  }
+  32% {
+    transform: translate(7px, 0px);
+  }
+  48% {
+    transform: translate(-4px, 0px);
+  }
+  64% {
+    transform: translate(4px, 0px);
+  }
+  80% {
+    transform: translate(-2px, 0px);
+  }
+  96% {
+    transform: translate(2px, 0px);
+  }
+  100% {
+    pointer-events: all;
+    transform: translate(0px, 0px);
+  }
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.75;
+  }
+}
+
+@keyframes fade-in-text-effect {
+  100% {
+    scale: 250 1;
+    opacity: 0.1;
+    transform: translateX(100%);
+  }
+}

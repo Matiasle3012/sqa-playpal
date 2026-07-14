@@ -1,0 +1,15 @@
+services:
+  mongo:
+    image: mongo:7
+    container_name: playpal-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: TEST
+    volumes:
+      - playpal-mongo-data:/data/db
+      - ./mongo-init:/docker-entrypoint-initdb.d:ro
+
+volumes:
+  playpal-mongo-data:
