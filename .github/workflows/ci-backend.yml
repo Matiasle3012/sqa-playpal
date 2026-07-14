@@ -43,6 +43,14 @@ jobs:
         run: chmod +x mvnw
         working-directory: backend-spring-boot/playpal
 
+      - name: Create Temporary Application Properties for Testing
+        run: |
+          mkdir -p src/main/resources
+          echo "spring.application.name=PlayPal" > src/main/resources/application.properties
+          echo "spring.data.mongodb.uri=mongodb://localhost:27017/TEST" >> src/main/resources/application.properties
+          echo "jwt.secret=DummySecretForTestingPurposeOnly123456789" >> src/main/resources/application.properties
+        working-directory: backend-spring-boot/playpal
+
       - name: Run Backend Tests
         id: run-tests
         run: ./mvnw clean test
