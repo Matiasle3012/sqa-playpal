@@ -5,6 +5,7 @@ import com.api.playpal.court.infrastructure.CourtRepositoryImp;
 import com.api.playpal.reservation.domain.Reservation;
 import com.api.playpal.reservation.infrastructure.ReservationRepositoryImp;
 import com.api.playpal.user.domain.User;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -16,9 +17,13 @@ import java.util.Optional;
 public class ReservationService {
     private final ReservationRepositoryImp reservationRepository;
     private final CourtRepositoryImp courtRepository;
-    public ReservationService(ReservationRepositoryImp reservationRepository, CourtRepositoryImp courtRepository) {
+    private final long advanceHours;
+
+    public ReservationService(ReservationRepositoryImp reservationRepository, CourtRepositoryImp courtRepository,
+                              @Value("${reservation.advance-hours:12}") long advanceHours) {
         this.reservationRepository = reservationRepository;
         this.courtRepository = courtRepository;
+        this.advanceHours = advanceHours;
     }
 
     public List<Reservation> findByCourt(String courtId) {
@@ -38,8 +43,8 @@ public class ReservationService {
         Court court = courtRepository.findById(courtid).orElseThrow(()-> new RuntimeException("Court not founded"));
         try {
             LocalDate.parse(date);
-            if (LocalDateTime.parse(date + "T" + String.format("%02d", Integer.parseInt(start))+":00").isBefore(LocalDateTime.now().plusHours(12))) {
-                throw new RuntimeException("Invalid date (must be 12 hours before minimum)");
+            if (LocalDateTime.parse(date + "T" + String.format("%02d", Integer.parseInt(start))+":00").isBefore(LocalDateTime.now().plusHours(advanceHours))) {
+                throw new RuntimeException("Invalid date (must be " + advanceHours + " hours before minimum)");
             }
             if (Integer.parseInt(end) <= Integer.parseInt(start)) {
                 throw new RuntimeException("End must be greater than start");

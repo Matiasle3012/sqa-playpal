@@ -1,6 +1,5 @@
 package com.api.playpal.auth.infrastructure;
 
-import com.api.playpal.user.domain.User;
 import com.api.playpal.user.infrastructure.UserRepositoryImp;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -28,16 +27,17 @@ public class JwtFilter extends OncePerRequestFilter {
         String authHeader = request.getHeader("Authorization");
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
-            String userId = tokenUtil.extractId(token);
-
-            if (userId != null && tokenUtil.isTokenValid(token)) {
-                User user = userRepositoryImp.findById(userId)
-                        .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-                if (user != null) {
-                    UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user, null, null);
-                    authenticationToken.setDetails(new WebAuthenticationDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            try {
+                String userId = tokenUtil.extractId(token);
+                if (userId != null && tokenUtil.isTokenValid(token)) {
+                    userRepositoryImp.findById(userId).ifPresent(user -> {
+                        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user, null, null);
+                        authenticationToken.setDetails(new WebAuthenticationDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                    });
                 }
+            } catch (Exception e) {
+                SecurityContextHolder.clearContext();
             }
         }
         filterChain.doFilter(request, response);

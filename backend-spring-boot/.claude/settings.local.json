@@ -4,7 +4,8 @@
       "PowerShell(Start-Process \"C:\\\\Program Files\\\\Docker\\\\Docker\\\\Docker Desktop.exe\")",
       "PowerShell(Test-NetConnection *)",
       "PowerShell(Get-NetTCPConnection *)",
-      "PowerShell(Get-Process *)"
+      "PowerShell(Get-Process *)",
+      "mcp__plugin_context-mode_context-mode__ctx_execute"
     ]
   }
 }
