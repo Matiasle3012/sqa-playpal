@@ -94,6 +94,14 @@ jobs:
           # Get current UTC timestamp in ISO 8601 format
           TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
+          # Read the markdown report if it exists
+          REPORT_FILE="backend-spring-boot/playpal/target/test_report.md"
+          if [ -f "$REPORT_FILE" ]; then
+            REPORT_CONTENT=$(cat "$REPORT_FILE")
+          else
+            REPORT_CONTENT="No se generó reporte de métricas."
+          fi
+
           echo "Preparing payload for project: SQA - Backend SpringBoot"
           echo "Status: $STATUS"
           echo "Branch: $BRANCH_NAME"
@@ -112,6 +120,7 @@ jobs:
             --arg branch "$BRANCH_NAME" \
             --arg actor "$ACTOR" \
             --arg ts "$TIMESTAMP" \
+            --arg report "$REPORT_CONTENT" \
             '{
               records: [
                 {
@@ -121,7 +130,8 @@ jobs:
                     "Commit SHA": $sha,
                     "Nombre de la rama": $branch,
                     "Actor": $actor,
-                    "Timestamp": $ts
+                    "Timestamp": $ts,
+                    "Reporte": $report
                   }
                 }
               ]

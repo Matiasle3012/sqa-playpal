@@ -391,5 +391,11 @@ def main():
     with open(summary_file, 'a', encoding='utf-8') as f:
         f.write("\n".join(md) + "\n")
 
+    # Also write to a separate markdown file for Airtable
+    report_file = 'backend-spring-boot/playpal/target/test_report.md'
+    os.makedirs(os.path.dirname(report_file), exist_ok=True)
+    with open(report_file, 'w', encoding='utf-8') as f:
+        f.write("\n".join(md) + "\n")
+
 if __name__ == '__main__':
     main()
