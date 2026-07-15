@@ -56,6 +56,17 @@ jobs:
         run: ./mvnw clean test
         working-directory: backend-spring-boot/playpal
 
+      - name: Generate Test Report Summary
+        if: always()
+        run: python .github/scripts/parse_tests.py
+
+      - name: Upload Test Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports
+          path: backend-spring-boot/playpal/target/surefire-reports/
+
       - name: Send Notification to Airtable
         if: always()
         env:
