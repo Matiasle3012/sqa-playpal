@@ -53,7 +53,7 @@ jobs:
 
       - name: Run Backend Tests
         id: run-tests
-        run: ./mvnw clean test
+        run: ./mvnw clean test -Pnightly
         working-directory: backend-spring-boot/playpal
 
       - name: Generate Test Report Summary
